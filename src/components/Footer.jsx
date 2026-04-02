@@ -36,7 +36,7 @@ export default function Footer() {
             <Link to="/orders">My Orders</Link>
             <Link to="/track">Track Order</Link>
             <a href="#" onClick={e => { e.preventDefault(); setShowSizeGuide(true); }}>Size Guide</a>
-            <a href="#">Returns & Refunds</a>
+            <Link to="/orders">Returns & Refunds</Link>
           </div>
 
           <div className="footer-links-group">

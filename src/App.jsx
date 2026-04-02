@@ -9,11 +9,14 @@ import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import TrackOrder from './pages/TrackOrder';
 import SearchPage from './pages/SearchPage';
+import ScrollToTop from './components/ScrollToTop';
+import { Scroll } from 'lucide-react';
 
 export default function App() {
   return (
     <CartProvider>
       <ToastProvider>
+        <ScrollToTop />
         <Navbar />
         <Routes>
           <Route path="/"                  element={<Home />} />

@@ -76,7 +76,7 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-
+              
             <Link to="/orders" className={`nav-link ${location.pathname === '/orders' ? 'active' : ''}`}>
               Orders
             </Link>
