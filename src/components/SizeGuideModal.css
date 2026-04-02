@@ -1,0 +1,212 @@
+/* Backdrop */
+.sg-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 25, 23, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Modal */
+.sg-modal {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 860px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  animation: scaleIn 0.25s ease;
+}
+
+/* Header */
+.sg-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.8rem 2rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+.sg-title {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.sg-subtitle { font-size: 13px; color: var(--text-muted); }
+.sg-close {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-secondary);
+  transition: all 0.2s; flex-shrink: 0;
+}
+.sg-close:hover { background: var(--error-bg); color: var(--error); border-color: var(--error); }
+
+/* Gender toggle */
+.sg-gender-toggle {
+  display: flex;
+  gap: 0;
+  padding: 1.2rem 2rem 0;
+}
+.sg-gender-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 24px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-muted);
+  font-size: 14px; font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer; transition: all 0.2s;
+  font-family: var(--font-body);
+}
+.sg-gender-btn:first-child { border-radius: var(--radius-full) 0 0 var(--radius-full); border-right: none; }
+.sg-gender-btn:last-child  { border-radius: 0 var(--radius-full) var(--radius-full) 0; }
+.sg-gender-btn.active {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: white;
+}
+.sg-gender-icon { font-size: 16px; }
+
+/* Body layout */
+.sg-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  padding: 1.5rem 2rem 2rem;
+}
+@media (max-width: 640px) {
+  .sg-body { grid-template-columns: 1fr; }
+  .sg-figure-col { display: flex; flex-direction: column; align-items: center; }
+}
+
+/* Figure */
+.sg-figure-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.sg-figure-wrap {
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  width: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.figure-svg { width: 100%; max-width: 160px; height: auto; }
+.sg-figure-hint { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.4; }
+
+/* Right col */
+.sg-right-col { display: flex; flex-direction: column; gap: 1.4rem; }
+
+/* Inputs */
+.sg-inputs { display: flex; flex-direction: column; gap: 10px; }
+.sg-inputs-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 2px;
+}
+.sg-input-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s; cursor: default;
+}
+.sg-input-row.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.sg-label {
+  display: flex; flex-direction: column; gap: 2px;
+  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  flex: 1;
+}
+.sg-label-hint { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+.sg-input {
+  width: 80px;
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  outline: none; text-align: center;
+  font-family: var(--font-body);
+  transition: border-color 0.2s;
+}
+.sg-input:focus { border-color: var(--accent); }
+.sg-find-btn {
+  align-self: flex-start;
+  background: var(--text-primary); color: white;
+  padding: 10px 22px; border-radius: var(--radius-full);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  font-family: var(--font-body); margin-top: 4px;
+}
+.sg-find-btn:hover { background: var(--accent); }
+
+/* Result */
+.sg-result {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--success-bg);
+  border: 1.5px solid var(--success);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  animation: fadeIn 0.3s ease;
+}
+.sg-result-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--success); flex: 1; }
+.sg-result-size {
+  font-family: var(--font-display);
+  font-size: 2.2rem; font-weight: 600;
+  color: var(--success);
+  line-height: 1;
+}
+.sg-result-sub { font-size: 11px; color: var(--success); opacity: 0.8; }
+.sg-apply-btn {
+  background: var(--success); color: white;
+  padding: 8px 18px; border-radius: var(--radius-full);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  font-family: var(--font-body); white-space: nowrap;
+}
+.sg-apply-btn:hover { opacity: 0.88; }
+
+/* Table */
+.sg-table-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 8px;
+}
+.sg-table-scroll { overflow-x: auto; }
+.sg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.sg-table th {
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--bg-muted);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+.sg-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.sg-table tr:last-child td { border-bottom: none; }
+.sg-size-cell { font-weight: 700; color: var(--text-primary); }
+.sg-table tr.highlighted-row td {
+  background: var(--accent-light);
+  color: var(--text-primary);
+}
+.sg-table tr.highlighted-row .sg-size-cell { color: var(--accent); }

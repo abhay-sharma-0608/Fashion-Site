@@ -1,0 +1,23 @@
+.search-page { padding-top: calc(var(--nav-height) + 2.5rem); padding-bottom: 5rem; min-height: 100vh; }
+
+.search-header { margin-bottom: 2.5rem; }
+.search-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; }
+.search-query { font-family: var(--font-display); font-size: 2.4rem; font-weight: 400; color: var(--text-primary); margin-bottom: 6px; }
+.search-count { font-size: 14px; color: var(--text-muted); }
+
+.search-empty {
+  text-align: center; padding: 4rem 2rem; color: var(--text-muted);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.search-empty svg { opacity: 0.3; }
+.search-empty h3 { font-size: 20px; color: var(--text-primary); }
+.search-empty p { font-size: 14px; }
+.search-cat-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1100px) { .search-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px)  { .search-grid { grid-template-columns: repeat(2, 1fr); } }
