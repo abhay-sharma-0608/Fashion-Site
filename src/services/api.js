@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BASE = import.meta.env.VITE_API_URL || 'https://drape-backend-gqe0.onrender.com/api';
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('accessToken');
