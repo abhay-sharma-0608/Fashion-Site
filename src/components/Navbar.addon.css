@@ -1,0 +1,80 @@
+/* ── Paste this at the BOTTOM of your existing Navbar.css ── */
+
+.nav-login-btn {
+  padding: 8px 18px;
+  background: var(--text-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: opacity 0.2s;
+}
+.nav-login-btn:hover { opacity: 0.8; }
+
+/* User dropdown */
+.nav-user-wrap { position: relative; }
+.nav-user-btn { position: relative; }
+
+.nav-user-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  padding: 8px 0;
+  z-index: 200;
+  animation: fadeDown 0.2s ease both;
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.user-dropdown-name {
+  padding: 10px 16px 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.user-dropdown-email {
+  padding: 0 16px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.user-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+}
+.user-dropdown-item:hover { background: var(--bg-secondary); }
+.user-dropdown-item.logout { color: var(--error); }
+
+/* Mobile auth */
+.mobile-user-name {
+  padding: 12px 20px 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.mobile-logout {
+  color: var(--error);
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 20px;
+  font-size: 15px;
+}

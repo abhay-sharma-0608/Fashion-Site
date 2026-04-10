@@ -1,18 +1,74 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { authAPI } from '../services/api';
+
+// ─── AUTH CONTEXT ─────────────────────────────────────────────────────────────
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
+  const [user, setUser]       = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // On mount, fetch current user if token exists
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) { setLoading(false); return; }
+    authAPI.getMe()
+      .then(data => setUser(data.user))
+      .catch(() => localStorage.removeItem('accessToken'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const login = useCallback(async (email, password) => {
+    const data = await authAPI.login({ email, password });
+    localStorage.setItem('accessToken', data.accessToken);
+    setUser(data.user);
+    return data;
+  }, []);
+
+  const register = useCallback(async (name, email, password, phone) => {
+    const data = await authAPI.register({ name, email, password, phone });
+    localStorage.setItem('accessToken', data.accessToken);
+    setUser(data.user);
+    return data;
+  }, []);
+
+  const logout = useCallback(async () => {
+    try { await authAPI.logout(); } catch {}
+    localStorage.removeItem('accessToken');
+    setUser(null);
+  }, []);
+
+  const updateUser = useCallback((updates) => {
+    setUser(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, isAuthenticated: !!user }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
 
 // ─── CART CONTEXT ─────────────────────────────────────────────────────────────
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('cart') || '[]'); } catch { return []; }
+  });
+
+  // Persist cart to localStorage
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(items));
+  }, [items]);
 
   const addItem = useCallback((product, size, color, qty = 1) => {
     setItems(prev => {
-      const key = `${product.id}-${size}-${color}`;
+      const key = `${product.productId || product.id}-${size}-${color}`;
       const existing = prev.find(i => i.key === key);
-      if (existing) {
-        return prev.map(i => i.key === key ? { ...i, qty: i.qty + qty } : i);
-      }
+      if (existing) return prev.map(i => i.key === key ? { ...i, qty: i.qty + qty } : i);
       return [...prev, { key, product, size, color, qty }];
     });
   }, []);
@@ -30,7 +86,7 @@ export function CartProvider({ children }) {
 
   const totalItems = items.reduce((s, i) => s + i.qty, 0);
   const subtotal   = items.reduce((s, i) => s + i.product.price * i.qty, 0);
-  const shipping   = subtotal > 2999 ? 0 : 99;
+  const shipping   = subtotal === 0 ? 0 : subtotal >= 999 ? 0 : 99;
   const total      = subtotal + shipping;
 
   return (

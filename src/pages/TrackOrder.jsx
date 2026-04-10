@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Search, Package, MapPin, Truck, CheckCircle, Clock, XCircle } from 'lucide-react';
-import { MOCK_ORDERS } from '../data/products';
+import { Search, MapPin, Truck, CheckCircle, Clock, XCircle, Package } from 'lucide-react';
+import { ordersAPI } from '../services/api';
+import { useAuth } from '../context/AppContext';
 import './TrackOrder.css';
 
 const STATUS_CONFIG = {
-  placed:     { icon: <Clock size={20}/>,        color: 'var(--text-muted)',   label: 'Order Placed',  bg: 'var(--bg-secondary)' },
-  processing: { icon: <Package size={20}/>,      color: 'var(--warning)',      label: 'Processing',    bg: 'var(--warning-bg)' },
-  shipped:    { icon: <Truck size={20}/>,         color: 'var(--info)',         label: 'Shipped',       bg: 'var(--info-bg)' },
-  delivered:  { icon: <CheckCircle size={20}/>,  color: 'var(--success)',      label: 'Delivered',     bg: 'var(--success-bg)' },
-  cancelled:  { icon: <XCircle size={20}/>,      color: 'var(--error)',        label: 'Cancelled',     bg: 'var(--error-bg)' },
+  placed:     { icon: <Clock size={20}/>,       color: 'var(--text-muted)',  label: 'Order Placed', bg: 'var(--bg-secondary)' },
+  processing: { icon: <Package size={20}/>,     color: 'var(--warning)',     label: 'Processing',   bg: 'var(--warning-bg)' },
+  shipped:    { icon: <Truck size={20}/>,        color: 'var(--info)',        label: 'Shipped',      bg: 'var(--info-bg)' },
+  delivered:  { icon: <CheckCircle size={20}/>, color: 'var(--success)',     label: 'Delivered',    bg: 'var(--success-bg)' },
+  cancelled:  { icon: <XCircle size={20}/>,     color: 'var(--error)',       label: 'Cancelled',    bg: 'var(--error-bg)' },
 };
 
 const TIMELINE = [
@@ -22,19 +23,38 @@ const STEP_MAP = { placed: 0, processing: 1, shipped: 2, delivered: 3 };
 export default function TrackOrder() {
   const [query,    setQuery]    = useState('');
   const [result,   setResult]   = useState(null);
+  const [loading,  setLoading]  = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const { isAuthenticated } = useAuth();
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     const q = query.trim().toUpperCase();
-    const order = MOCK_ORDERS.find(o => o.id.toUpperCase() === q);
-    if (order) { setResult(order); setNotFound(false); }
-    else { setResult(null); setNotFound(true); }
+    if (!q) return;
+
+    setLoading(true);
+    setResult(null);
+    setNotFound(false);
+
+    try {
+      if (isAuthenticated) {
+        // Search in user's own orders
+        const data = await ordersAPI.getMyOrders({ limit: 100 });
+        const found = data.orders.find(o => o.orderId.toUpperCase() === q);
+        if (found) { setResult(found); }
+        else { setNotFound(true); }
+      } else {
+        setNotFound(true);
+      }
+    } catch {
+      setNotFound(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const cfg    = result ? STATUS_CONFIG[result.status] : null;
-  const step   = result ? (STEP_MAP[result.status] ?? -1) : -1;
-  const total  = result ? result.items.reduce((s,i) => s + i.product.price * i.qty, 0) : 0;
+  const cfg  = result ? STATUS_CONFIG[result.status] : null;
+  const step = result ? (STEP_MAP[result.status] ?? -1) : -1;
 
   return (
     <div className="track-page">
@@ -46,31 +66,30 @@ export default function TrackOrder() {
 
         <form className="track-form" onSubmit={handleSearch}>
           <div className="track-input-wrap">
-            <Search size={18} className="track-search-icon" />
+            <Search size={18} className="track-search-icon"/>
             <input
               className="track-input"
-              placeholder="e.g. ORD-2025-0421"
+              placeholder="e.g. DRP-20240410-0001"
               value={query}
               onChange={e => setQuery(e.target.value)}
             />
           </div>
-          <button type="submit" className="track-btn">Track Order</button>
+          <button type="submit" className="track-btn" disabled={loading}>
+            {loading ? 'Searching…' : 'Track Order'}
+          </button>
         </form>
 
-        <div className="track-sample-ids">
-          <span>Try: </span>
-          {MOCK_ORDERS.map(o => (
-            <button key={o.id} className="sample-id" onClick={() => { setQuery(o.id); }}>
-              {o.id}
-            </button>
-          ))}
-        </div>
+        {!isAuthenticated && (
+          <p className="track-login-hint">
+            Please <a href="/login" style={{ color: 'var(--accent)', fontWeight: 600 }}>login</a> to track your orders.
+          </p>
+        )}
 
         {notFound && (
           <div className="track-not-found animate-fadeIn">
-            <XCircle size={40} />
+            <XCircle size={40}/>
             <h3>Order Not Found</h3>
-            <p>We couldn't find an order with ID "{query}". Please check and try again.</p>
+            <p>We couldn't find order <strong>"{query}"</strong>. Please check the ID and try again.</p>
           </div>
         )}
 
@@ -81,12 +100,12 @@ export default function TrackOrder() {
               <div className="track-status-icon" style={{ color: cfg.color }}>{cfg.icon}</div>
               <div>
                 <p className="track-status-label" style={{ color: cfg.color }}>{cfg.label}</p>
-                <p className="track-order-id">{result.id}</p>
+                <p className="track-order-id">{result.orderId}</p>
               </div>
               <span className={`status status-${result.status}`}>{cfg.label}</span>
             </div>
 
-            {/* Timeline - only for non-cancelled */}
+            {/* Timeline */}
             {result.status !== 'cancelled' && (
               <div className="track-timeline">
                 {TIMELINE.map((t, i) => {
@@ -95,8 +114,8 @@ export default function TrackOrder() {
                   return (
                     <div key={t.key} className={`track-tl-step ${isDone ? 'done' : ''} ${isCurrent ? 'current' : ''}`}>
                       <div className="tl-icon-wrap">
-                        <div className="tl-icon" />
-                        {i < TIMELINE.length - 1 && <div className="tl-connector" />}
+                        <div className="tl-icon"/>
+                        {i < TIMELINE.length - 1 && <div className="tl-connector"/>}
                       </div>
                       <div className="tl-content">
                         <p className="tl-label">{t.label}</p>
@@ -108,36 +127,45 @@ export default function TrackOrder() {
               </div>
             )}
 
-            {/* Order Details */}
+            {/* Details */}
             <div className="track-details-grid">
               <div className="track-detail-card">
                 <h4>Order Items</h4>
                 {result.items.map((item, i) => (
                   <div key={i} className="track-item">
-                    <img src={item.product.image} alt={item.product.name} />
+                    <img src={item.image} alt={item.name}/>
                     <div>
-                      <p className="track-item-name">{item.product.name}</p>
+                      <p className="track-item-name">{item.name}</p>
                       <p className="track-item-meta">{item.color} · Size {item.size} · Qty {item.qty}</p>
                     </div>
-                    <span className="track-item-price">₹{(item.product.price * item.qty).toLocaleString('en-IN')}</span>
+                    <span className="track-item-price">₹{(item.price * item.qty).toLocaleString('en-IN')}</span>
                   </div>
                 ))}
                 <div className="track-items-total">
                   <span>Total</span>
-                  <span>₹{total.toLocaleString('en-IN')}</span>
+                  <span>₹{result.total.toLocaleString('en-IN')}</span>
                 </div>
               </div>
               <div className="track-detail-card">
                 <h4>Delivery Address</h4>
-                <div className="track-address"><MapPin size={14}/><p>{result.address}</p></div>
-                <h4 style={{marginTop:'1rem'}}>Payment</h4>
-                <p className="track-payment">{result.payment}</p>
-                <h4 style={{marginTop:'1rem'}}>Order Date</h4>
-                <p className="track-date">{new Date(result.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                {result.deliveredOn && <>
-                  <h4 style={{marginTop:'1rem'}}>Delivered On</h4>
-                  <p className="track-date" style={{color:'var(--success)'}}>
-                    {new Date(result.deliveredOn).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                {result.shipping && (
+                  <div className="track-address">
+                    <MapPin size={14}/>
+                    <p>{result.shipping.name}, {result.shipping.line1}, {result.shipping.city}, {result.shipping.state} – {result.shipping.pincode}</p>
+                  </div>
+                )}
+                <h4 style={{ marginTop: '1rem' }}>Payment</h4>
+                <p className="track-payment">{result.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}</p>
+                {result.trackingNumber && <>
+                  <h4 style={{ marginTop: '1rem' }}>Tracking Number</h4>
+                  <p className="track-payment" style={{ fontWeight: 700 }}>{result.trackingNumber}</p>
+                </>}
+                <h4 style={{ marginTop: '1rem' }}>Order Date</h4>
+                <p className="track-date">{new Date(result.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' })}</p>
+                {result.deliveredAt && <>
+                  <h4 style={{ marginTop: '1rem' }}>Delivered On</h4>
+                  <p className="track-date" style={{ color: 'var(--success)' }}>
+                    {new Date(result.deliveredAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' })}
                   </p>
                 </>}
               </div>

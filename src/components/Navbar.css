@@ -255,3 +255,27 @@
   .navbar-inner { padding: 0 1rem; }
   .nav-search-bar { padding: 10px 1rem; }
 }
+
+.nav-login-btn {
+  padding: 8px 18px;
+  background: var(--text-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: opacity 0.2s;
+}
+.nav-login-btn:hover { opacity: 0.8; }
+
+.nav-user-wrap { position: relative; }
+.nav-user-btn { position: relative; }
+
+.nav-user-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+}
+
+.nav-account-dropdown { min-width: 200px; right: 0; left: auto; }
+.nav-account-dropdown .dropdown-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-primary); }
